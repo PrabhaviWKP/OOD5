@@ -5,6 +5,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import Database.DatabaseConnection;
 
 public class RegisterController {
 
@@ -33,9 +37,34 @@ public class RegisterController {
             return;
         }
 
-        // TODO: Save user data to a database or file
-        showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Welcome, " + username + "!");
-        clearForm();
+        registerUser(username, password);
+    }
+
+    private void registerUser(String username, String password) {
+        DatabaseConnection connectNow = new DatabaseConnection();
+        Connection connectDB = connectNow.getConnection();
+
+        String insertQuery = "INSERT INTO users VALUES(?,?,?)";
+
+        try{
+            PreparedStatement preparedStatement = connectDB.prepareStatement(insertQuery);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result == 0) {
+                showAlert(Alert.AlertType.INFORMATION, "Registration Successful!", "Welcome" + username + "!");
+                clearForm();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Registration Failed!", "Something went wrong!");
+            }
+            preparedStatement.close();
+            connectDB.close();
+        } catch (Exception e){
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "An error occured!");
+        }
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
