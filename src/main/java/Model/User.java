@@ -23,6 +23,10 @@ public class User {
     public String getLastName() {return lastName;}
     public String getPassword() {return password;}
 
+    public static boolean isValidName(String name) {
+        return name.matches("[a-zA-Z]+");
+    }
+
     public static boolean isValidPassword(String password) {
         return password.length() >= 6;
     }

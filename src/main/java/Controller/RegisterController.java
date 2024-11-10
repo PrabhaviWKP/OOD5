@@ -8,6 +8,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import static Model.User.isValidName;
+
 public class RegisterController extends BaseController {
 
     @FXML
@@ -41,6 +43,10 @@ public class RegisterController extends BaseController {
 
         if (userName.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill all the fields.");
+            return;
+        }
+        if (!isValidName(firstName) || !isValidName(lastName)) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Names must contain only letters.");
             return;
         }
 

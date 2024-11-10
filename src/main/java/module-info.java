@@ -3,6 +3,7 @@ module org.example.ood5 {
     requires javafx.fxml;
     requires javafx.graphics;
     requires java.sql;
+    requires com.google.gson;
 
 
     opens Main to javafx.graphics, javafx.fxml;
