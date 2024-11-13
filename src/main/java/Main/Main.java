@@ -1,5 +1,6 @@
 package Main;
 
+import Database.DatabaseHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,6 +12,9 @@ import Model.Article;
 import javafx.application.Platform;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
@@ -18,6 +22,10 @@ public class Main extends Application {
 
     // Instantiate ArticleService to fetch articles
     private ArticleService articleService = new ArticleService();
+    private DatabaseHandler dbHandler = new DatabaseHandler();
+
+    // Scheduler for periodic fetching
+    private ScheduledExecutorService scheduler;
 
     @Override
     public void start(Stage stage) throws Exception {
