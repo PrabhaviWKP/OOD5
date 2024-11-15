@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class DatabaseHandler {
     private final DatabaseConnection databaseConnection;
@@ -62,5 +61,38 @@ public class DatabaseHandler {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Store the last fetch time in the database
+    public void storeLastFetchTime(LocalDateTime lastFetchTime) {
+        String sql = "INSERT INTO fetch_times (last_fetch_time) VALUES (?) ON DUPLICATE KEY UPDATE last_fetch_time = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setTimestamp(1, java.sql.Timestamp.valueOf(lastFetchTime));
+            statement.setTimestamp(2, java.sql.Timestamp.valueOf(lastFetchTime));
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Retrieve the last fetch time from the database
+    public LocalDateTime getLastFetchTime() {
+        String sql = "SELECT last_fetch_time FROM fetch_times LIMIT 1";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getTimestamp("last_fetch_time").toLocalDateTime();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

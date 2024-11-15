@@ -11,6 +11,8 @@ import Model.Article;
 
 import javafx.application.Platform;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,8 +33,18 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
 
-        // Fetch articles in a separate thread to avoid blocking UI
-        fetchArticlesAsync();
+        // Check if articles need to be fetched
+        LocalDateTime lastFetchTime = dbHandler.getLastFetchTime();
+        if (lastFetchTime == null || ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now()) >= 24) {
+            // Fetch articles in a separate thread to avoid blocking UI
+            fetchArticlesAsync();
+        } else {
+            System.out.println("Using saved articles in the database");
+        }
+
+        // Schedule fetchArticlesAsync to run every 24 hours
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(this::fetchArticlesAsync, 24, 24, TimeUnit.HOURS);
 
         loadMainMenu(); // Load the main menu
     }
@@ -77,9 +89,11 @@ public class Main extends Application {
                 // Optionally, store articles in the database
                 articles.forEach(article -> {
                     // Assuming you have a DatabaseHandler class for storing articles
-                    Database.DatabaseHandler dbHandler = new Database.DatabaseHandler(new Database.DatabaseConnection());
                     dbHandler.insertArticle(article);
                 });
+
+                // Update last fetch time
+                dbHandler.storeLastFetchTime(LocalDateTime.now());
             });
         }).start();
     }
