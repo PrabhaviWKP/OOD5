@@ -47,4 +47,9 @@ public class Article {
     public Date getPublicationDate() { return publicationDate; }
     public String getContent() { return content; }
     public String getCategory() { return category; }
+
+    // Setter for category
+    public void setCategory(String category) {
+        this.category = category;
+    }
 }
