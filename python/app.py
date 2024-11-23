@@ -19,6 +19,15 @@ def classify_text():
     # Classify the text
     result = classifier(text, categories)
     top_category = result["labels"][0]
+    confidence = result["scores"][0]
+
+    # Threshold for classification confidence
+    CONFIDENCE_THRESHOLD = 0.5  # Adjust as needed
+
+    # If confidence is below the threshold, return "Unknown"
+    if confidence < CONFIDENCE_THRESHOLD:
+        top_category = "Unknown"
+
     return jsonify({"category": top_category})
 
 if __name__ == "__main__":

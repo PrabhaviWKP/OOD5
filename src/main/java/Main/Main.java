@@ -35,7 +35,7 @@ public class Main extends Application {
 
         // Check if articles need to be fetched
         LocalDateTime lastFetchTime = dbHandler.getLastFetchTime();
-        if (lastFetchTime == null || ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now()) >= 24) {
+        if (lastFetchTime == null || ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now()) >= 6) {
             // Fetch articles in a separate thread to avoid blocking UI
             fetchArticlesAsync();
         } else {

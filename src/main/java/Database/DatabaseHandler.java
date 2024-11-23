@@ -101,7 +101,7 @@ public class DatabaseHandler {
         String responseBody = response.body();
         Gson gson = new Gson();
         Map<String, String> responseMap = gson.fromJson(responseBody, Map.class);
-        return responseMap.get("category"); // Return the category from the response
+        return responseMap.getOrDefault("category","Unknown"); // Return the category from the response
     }
 
     // Store the last fetch time in the database
