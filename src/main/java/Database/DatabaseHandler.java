@@ -1,6 +1,13 @@
 package Database;
 
 import Model.Article;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
+import com.google.gson.Gson;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,13 +23,21 @@ public class DatabaseHandler {
 
     // No-argument constructor
     public DatabaseHandler() {
-        // Initialize the DatabaseConnection within this class
         this.databaseConnection = new DatabaseConnection();
     }
 
-    // Insert a new article only if it doesn't exist in the database
+    // Insert a new article and classify it
     public void insertArticle(Article article) {
         if (!articleExists(article.getUrl())) {
+            // Classify the article before saving
+            try {
+                String category = classifyArticle(article.getContent());
+                article.setCategory(category); // Set the category for the article
+            } catch (Exception e) {
+                e.printStackTrace();
+                return; // If classification fails, skip saving the article
+            }
+
             String sql = "INSERT INTO articles (title, source, url, content, category, publicationDate) VALUES (?, ?, ?, ?, ?, ?)";
             try (Connection connection = databaseConnection.getConnection();
                  PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -61,6 +76,32 @@ public class DatabaseHandler {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Classify article content using the Flask API
+    private String classifyArticle(String articleContent) throws Exception {
+        // Prepare the HTTP request to Flask API
+        String apiUrl = "http://localhost:5000/classify"; // Flask API URL
+        Map<String, String> requestData = new HashMap<>();
+        requestData.put("text", articleContent);
+        String json = new Gson().toJson(requestData);
+
+        // Create HTTP client and request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        // Send request and get response
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Parse the response
+        String responseBody = response.body();
+        Gson gson = new Gson();
+        Map<String, String> responseMap = gson.fromJson(responseBody, Map.class);
+        return responseMap.get("category"); // Return the category from the response
     }
 
     // Store the last fetch time in the database

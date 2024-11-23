@@ -4,6 +4,9 @@ module org.example.ood5 {
     requires javafx.graphics;
     requires java.sql;
     requires com.google.gson;
+    requires java.net.http;
+    requires jdk.httpserver;
+    requires mysql.connector.j;
 
 
     opens Main to javafx.graphics, javafx.fxml;
