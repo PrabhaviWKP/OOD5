@@ -4,9 +4,12 @@ import Model.User;
 import Service.userService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import static Model.User.isValidName;
 
@@ -24,6 +27,8 @@ public class RegisterController extends BaseController {
     private PasswordField txtPassword;
     @FXML
     private PasswordField txtConfirmPassword;
+    @FXML
+    private VBox preferencesBox;
 
     private userService userService = new userService();
 
@@ -65,7 +70,22 @@ public class RegisterController extends BaseController {
             return;
         }
 
-        User newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password);
+        // Collect selected preferences
+        StringBuilder preferences = new StringBuilder();
+        for (Node node : preferencesBox.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                if (checkBox.isSelected()) {
+                    if (preferences.length() > 0) {
+                        preferences.append(",");
+                    }
+                    preferences.append(checkBox.getText());
+                }
+            }
+        }
+
+        User newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password, preferences.toString());
+        newUser.setPreferences(preferences.toString()); // Add preferences to the User object
 
         if (userService.registerUser(newUser)) {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Welcome " + userName + "!");

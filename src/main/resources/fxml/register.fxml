@@ -26,6 +26,15 @@
     <Label text="Last Name:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
     <TextField fx:id="txtLastName" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
+    <VBox fx:id="preferencesBox" GridPane.rowIndex="4" GridPane.columnIndex="1" spacing="5">
+        <CheckBox text="Technology"/>
+        <CheckBox text="Health"/>
+        <CheckBox text="Sports"/>
+        <CheckBox text="AI"/>
+        <CheckBox text="Politics"/>
+        <CheckBox text="Entertainment"/>
+    </VBox>
+
     <!-- Password -->
     <Label text="Password:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
     <PasswordField fx:id="txtPassword" GridPane.rowIndex="4" GridPane.columnIndex="1"/>

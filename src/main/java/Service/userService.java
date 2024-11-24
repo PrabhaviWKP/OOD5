@@ -43,7 +43,7 @@ public class userService {
     }
 
     public boolean registerUser(User user) {
-        String insertQuery = "INSERT INTO users (userID, userName, firstName, lastName, password) VALUES (?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO users (userID, userName, firstName, lastName, password, preferences) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connectDB = new DatabaseConnection().getConnection();
              PreparedStatement preparedStatement = connectDB.prepareStatement(insertQuery)) {
 
@@ -52,6 +52,7 @@ public class userService {
             preparedStatement.setString(3, user.getFirstName());
             preparedStatement.setString(4, user.getLastName());
             preparedStatement.setString(5, user.getPassword());
+            preparedStatement.setString(6, user.getPreferences());
 
             return preparedStatement.executeUpdate() > 0;
 

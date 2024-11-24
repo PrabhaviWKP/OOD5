@@ -11,6 +11,7 @@ import Model.Article;
 
 import javafx.application.Platform;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -22,22 +23,23 @@ public class Main extends Application {
 
     private static Stage primaryStage;
 
-    // Instantiate ArticleService to fetch articles
     private ArticleService articleService = new ArticleService();
     private DatabaseHandler dbHandler = new DatabaseHandler();
 
-    // Scheduler for periodic fetching
     private ScheduledExecutorService scheduler;
+    private Process flaskProcess;
 
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
 
+        // Start the Flask server
+        startFlaskServer();
+
         // Check if articles need to be fetched
         LocalDateTime lastFetchTime = dbHandler.getLastFetchTime();
         if (lastFetchTime == null || ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now()) >= 6) {
-            // Fetch articles in a separate thread to avoid blocking UI
-            fetchArticlesAsync();
+            fetchArticlesAsync(); // Fetch articles in a separate thread
         } else {
             System.out.println("Using saved articles in the database");
         }
@@ -60,7 +62,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    // Method to load the login screen
     public static void loadLoginScreen() throws Exception {
         Parent root = FXMLLoader.load(Main.class.getResource("/fxml/Login.fxml"));
         primaryStage.setTitle("User Login");
@@ -68,7 +69,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    // Method to load the registration screen
     public static void loadRegisterScreen() throws Exception {
         Parent root = FXMLLoader.load(Main.class.getResource("/fxml/register.fxml"));
         primaryStage.setTitle("User Registration");
@@ -76,25 +76,50 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    // Method to fetch articles asynchronously
     private void fetchArticlesAsync() {
         new Thread(() -> {
             List<Article> articles = articleService.fetchArticlesFromAPI(); // Fetch articles from API
 
-            // Now that we have the articles, you can update the UI on the JavaFX Application Thread
             Platform.runLater(() -> {
-                // Do something with the articles (e.g., store in DB, update UI)
                 System.out.println("Articles fetched: " + articles.size());
 
-                // Optionally, store articles in the database
-                articles.forEach(article -> {
-                    // Assuming you have a DatabaseHandler class for storing articles
-                    dbHandler.insertArticle(article);
-                });
+                // Store articles in the database
+                articles.forEach(article -> dbHandler.insertArticle(article));
 
                 // Update last fetch time
                 dbHandler.storeLastFetchTime(LocalDateTime.now());
             });
         }).start();
+    }
+
+    // Start the Flask server
+    private void startFlaskServer() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\prabh\\IdeaProjects\\OOD5\\python\\app.py");
+            pb.redirectErrorStream(true);
+            flaskProcess = pb.start();
+            System.out.println("Flask server started successfully.");
+
+            // Delay to ensure Flask server is fully ready
+            Thread.sleep(10000); // Wait for 5 seconds
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to start Flask server: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+
+        // Shut down the Flask server when the JavaFX application closes
+        if (flaskProcess != null && flaskProcess.isAlive()) {
+            flaskProcess.destroy();
+            System.out.println("Flask server stopped.");
+        }
+
+        // Shut down the scheduler
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
     }
 }
