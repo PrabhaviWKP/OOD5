@@ -12,6 +12,10 @@ public class Article {
     private String category;
     private Date publicationDate;
 
+    // No-argument constructor
+    public Article() {
+    }
+
     // Constructor
     public Article(String title, String source, String url, String content, String category, String publicationDateStr) {
         this.title = title;
@@ -51,5 +55,13 @@ public class Article {
     // Setter for category
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

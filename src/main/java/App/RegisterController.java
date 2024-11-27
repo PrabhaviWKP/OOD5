@@ -1,4 +1,4 @@
-package Controller;
+package App;
 
 import Model.User;
 import Service.userService;

@@ -38,15 +38,25 @@ public class Main extends Application {
 
         // Check if articles need to be fetched
         LocalDateTime lastFetchTime = dbHandler.getLastFetchTime();
-        if (lastFetchTime == null || ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now()) >= 6) {
-            fetchArticlesAsync(); // Fetch articles in a separate thread
+
+        if (lastFetchTime == null) {
+            System.out.println("No fetch history found. Fetching articles...");
+            fetchArticlesAsync(); // First-time fetch
         } else {
-            System.out.println("Using saved articles in the database");
+            long hoursSinceLastFetch = ChronoUnit.HOURS.between(lastFetchTime, LocalDateTime.now());
+            System.out.println("Last fetch was " + hoursSinceLastFetch + " hours ago.");
+
+            if (hoursSinceLastFetch < 6) {
+                System.out.println("Using saved articles in the database (within 6 hours).");
+            } else {
+                System.out.println("Last fetch was more than 6 hours ago. Fetching new articles...");
+                fetchArticlesAsync();
+            }
         }
 
-        // Schedule fetchArticlesAsync to run every 24 hours
+        // Schedule fetchArticlesAsync to run every 6 hours
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::fetchArticlesAsync, 24, 24, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(this::fetchArticlesAsync, 6, 6, TimeUnit.HOURS);
 
         loadMainMenu(); // Load the main menu
     }
@@ -56,28 +66,28 @@ public class Main extends Application {
     }
 
     public static void loadMainMenu() throws Exception {
-        Parent root = FXMLLoader.load(Main.class.getResource("/fxml/MainMenu.fxml"));
+        Parent root = FXMLLoader.load(Main.class.getResource("/App/MainMenu.fxml"));
         primaryStage.setTitle("Main Menu");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
     public static void loadLoginScreen() throws Exception {
-        Parent root = FXMLLoader.load(Main.class.getResource("/fxml/Login.fxml"));
+        Parent root = FXMLLoader.load(Main.class.getResource("/App/Login.fxml"));
         primaryStage.setTitle("User Login");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
     public static void loadRegisterScreen() throws Exception {
-        Parent root = FXMLLoader.load(Main.class.getResource("/fxml/register.fxml"));
+        Parent root = FXMLLoader.load(Main.class.getResource("/App/register.fxml"));
         primaryStage.setTitle("User Registration");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
-
     private void fetchArticlesAsync() {
         new Thread(() -> {
+            System.out.println("Fetching articles from API...");
             List<Article> articles = articleService.fetchArticlesFromAPI(); // Fetch articles from API
 
             Platform.runLater(() -> {
@@ -92,6 +102,7 @@ public class Main extends Application {
         }).start();
     }
 
+
     // Start the Flask server
     private void startFlaskServer() {
         try {
@@ -101,7 +112,7 @@ public class Main extends Application {
             System.out.println("Flask server started successfully.");
 
             // Delay to ensure Flask server is fully ready
-            Thread.sleep(10000); // Wait for 5 seconds
+            Thread.sleep(7000); // Wait for 5 seconds
         } catch (IOException | InterruptedException e) {
             System.err.println("Failed to start Flask server: " + e.getMessage());
         }

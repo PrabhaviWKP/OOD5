@@ -5,7 +5,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
 import java.sql.Connection;
@@ -114,11 +116,13 @@ public class DatabaseHandler {
             statement.setTimestamp(2, java.sql.Timestamp.valueOf(lastFetchTime));
 
             statement.executeUpdate();
+            System.out.println("Updated last fetch time to: " + lastFetchTime);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     // Retrieve the last fetch time from the database
     public LocalDateTime getLastFetchTime() {
@@ -128,12 +132,17 @@ public class DatabaseHandler {
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getTimestamp("last_fetch_time").toLocalDateTime();
+                LocalDateTime lastFetch = resultSet.getTimestamp("last_fetch_time").toLocalDateTime();
+                System.out.println("Retrieved last fetch time: " + lastFetch);
+                return lastFetch;
+            } else {
+                System.out.println("No last fetch time found in the database.");
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return null; // No fetch time found
     }
+
 }

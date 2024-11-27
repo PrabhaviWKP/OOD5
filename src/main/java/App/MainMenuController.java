@@ -1,4 +1,4 @@
-package Controller;
+package App;
 
 import Main.Main;
 import javafx.event.ActionEvent;
@@ -22,4 +22,6 @@ public class MainMenuController {
             e.printStackTrace();
         }
     }
+
+
 }
