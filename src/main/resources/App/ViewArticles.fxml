@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ViewArticlesController">
-    <TableView fx:id="articlesTable">
-        <columns>
-            <TableColumn fx:id="titleColumn" text="Title" />
-            <TableColumn fx:id="sourceColumn" text="Source" />
-            <TableColumn fx:id="urlColumn" text="URL" />
-            <TableColumn fx:id="contentColumn" text="Content" />
-            <TableColumn fx:id="categoryColumn" text="Category" />
-            <TableColumn fx:id="publicationDateColumn" text="Publication Date" />
-        </columns>
-    </TableView>
+    <ListView fx:id="articlesList" />
+    <TextArea fx:id="articleContent" editable="false" wrapText="true" />
 </VBox>

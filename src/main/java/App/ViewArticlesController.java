@@ -4,48 +4,64 @@ import Model.Article;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import Service.ArticleService;
+import javafx.stage.Stage;
 
 public class ViewArticlesController {
 
     @FXML
-    private TableView<Article> articlesTable;
+    private ListView<Article> articlesList;
 
     @FXML
-    private TableColumn<Article, String> titleColumn;
-
-    @FXML
-    private TableColumn<Article, String> sourceColumn;
-
-    @FXML
-    private TableColumn<Article, String> urlColumn;
-
-    @FXML
-    private TableColumn<Article, String> contentColumn;
-
-    @FXML
-    private TableColumn<Article, String> categoryColumn;
-
-    @FXML
-    private TableColumn<Article, String> publicationDateColumn;
+    private TextArea articleContent;
 
     private ArticleService articleService = new ArticleService();
 
     @FXML
     public void initialize() {
-        // Set up the table columns
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
-        urlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
-        contentColumn.setCellValueFactory(new PropertyValueFactory<>("content"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        publicationDateColumn.setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
-
         // Fetch and display articles
         ObservableList<Article> articles = FXCollections.observableArrayList(articleService.getAllArticles());
-        articlesTable.setItems(articles);
+        articlesList.setItems(articles);
+
+        // Set cell factory to display title and source
+        articlesList.setCellFactory(param -> new javafx.scene.control.ListCell<Article>() {
+            @Override
+            protected void updateItem(Article item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle() + " - " + item.getSource());
+                }
+            }
+        });
+
+        // Handle selection change to navigate to article content page
+        articlesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                showArticleContent(newValue);
+            }
+        });
+    }
+
+    private void showArticleContent(Article article) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/ArticleContent.fxml"));
+            Parent root = loader.load();
+            ArticleContentController controller = loader.getController();
+            controller.initialize(article);
+
+            Stage stage = new Stage();
+            stage.setTitle("Article Content");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
