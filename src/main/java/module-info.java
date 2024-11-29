@@ -10,7 +10,10 @@ module org.example.ood5 {
 
 
     opens Main to javafx.graphics, javafx.fxml;
-    exports Main;
     exports App;
+    exports Model;
+    exports Service;
+    exports Database;
+    exports Main;
     opens App to javafx.fxml;
 }

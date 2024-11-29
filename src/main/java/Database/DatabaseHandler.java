@@ -16,6 +16,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+import static java.sql.DriverManager.getConnection;
+
 public class DatabaseHandler {
     private final DatabaseConnection databaseConnection;
 
@@ -126,7 +128,7 @@ public class DatabaseHandler {
 
     // Retrieve the last fetch time from the database
     public LocalDateTime getLastFetchTime() {
-        String sql = "SELECT last_fetch_time FROM fetch_times LIMIT 1";
+        String sql = "SELECT last_fetch_time FROM fetch_times ORDER BY last_fetch_time DESC LIMIT 1";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -143,6 +145,32 @@ public class DatabaseHandler {
             e.printStackTrace();
         }
         return null; // No fetch time found
+    }
+
+    // Retrieve all articles from the database
+    public List<Article> getAllArticles() {
+        List<Article> articles = new ArrayList<>();
+        String query = "SELECT title, source, url, content, category, publicationDate FROM articles";
+        try (Connection connection = new DatabaseConnection().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                articles.add(new Article(
+                        resultSet.getString("title"),
+                        resultSet.getString("source"),
+                        resultSet.getString("url"),
+                        resultSet.getString("content"),
+                        resultSet.getString("category"),
+                        resultSet.getString("publicationDate")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching articles: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return articles;
     }
 
 }

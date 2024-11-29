@@ -24,6 +24,7 @@ public class Article {
         this.content = content;
         this.category = category;
         this.publicationDate = parseDate(publicationDateStr);
+
     }
 
     // Utility to parse date
@@ -43,7 +44,6 @@ public class Article {
                 source != null && !source.isEmpty() &&
                 url != null && !url.isEmpty();
     }
-
     // Getters and other methods
     public String getTitle() { return title; }
     public String getSource() { return source; }

@@ -1,5 +1,8 @@
 package Model;
 
+import Database.DatabaseHandler;
+import java.util.List;
+
 public class User {
     private int userID;
     private String userName;
@@ -17,14 +20,33 @@ public class User {
         this.preferences = preferences;
     }
 
-    public int getUserID() {return userID;}
-    public String getUserName() {return userName;}
-    public String getFirstName() {return firstName;}
-    public String getLastName() {return lastName;}
-    public String getPassword() {return password;}
-    public String getPreferences() {return preferences;}
+    public int getUserID() {
+        return userID;
+    }
 
-    public void setPreferences(String preferences) {this.preferences = preferences;}
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(String preferences) {
+        this.preferences = preferences;
+    }
 
     public static boolean isValidName(String name) {
         return name.matches("[a-zA-Z]+");

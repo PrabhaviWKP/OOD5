@@ -25,7 +25,7 @@ public class userDashboardController {
     private void handleViewArticles() {
         // Logic to go to the "View Articles" screen
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/your/ViewArticles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/ViewArticles.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("View Articles");

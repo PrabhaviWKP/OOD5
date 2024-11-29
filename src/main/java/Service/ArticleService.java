@@ -1,5 +1,6 @@
 package Service;
 
+import Database.DatabaseHandler;
 import Model.Article;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleService {
+    private DatabaseHandler dbHandler = new DatabaseHandler();
     private static final String API_KEY = "0ada196c1f4f45d78729839c05e7d31d";
     private final String API_URL = "https://newsapi.org/v2/top-headlines?country=us&apiKey=" + API_KEY;
 
@@ -43,7 +45,7 @@ public class ArticleService {
                 String urlToArticle = articleJson.get("url").getAsString();
                 String content = articleJson.has("content") && !articleJson.get("content").isJsonNull() ? articleJson.get("content").getAsString() : "";
                 String publicationDate = articleJson.get("publishedAt").getAsString();
-
+                String urlToImage = articleJson.get("urlToImage").getAsString();
                 Article article = new Article(title, source, urlToArticle, content, "General", publicationDate);
 
                 // Validate article and add to list if valid
@@ -57,5 +59,10 @@ public class ArticleService {
         }
 
         return articles;
+    }
+
+    // Fetch all articles from the database
+    public List<Article> getAllArticles() {
+        return dbHandler.getAllArticles();
     }
 }

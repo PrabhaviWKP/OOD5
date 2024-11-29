@@ -1,5 +1,6 @@
 package App;
 
+import Model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -19,11 +20,8 @@ public class LoginController {
     @FXML
     private PasswordField password;
 
-    private userService userService;
+    private userService userService = new userService();
 
-    public LoginController() {
-        this.userService = new userService();
-    }
 
     // Handle login logic
     @FXML

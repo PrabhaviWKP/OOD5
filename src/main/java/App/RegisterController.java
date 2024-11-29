@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import Main.Main;
 
 import static Model.User.isValidName;
 
@@ -90,6 +91,15 @@ public class RegisterController extends BaseController {
         if (userService.registerUser(newUser)) {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Welcome " + userName + "!");
             clearForm();
+
+            // Redirect to login screen
+            try {
+                Main.loadLoginScreen(); // Call the static method from Main
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Unable to load the login screen.");
+            }
+
         } else {
             showAlert(Alert.AlertType.ERROR, "Registration Failed", "Something went wrong!");
         }
