@@ -79,4 +79,18 @@ public class userService {
         return false;
 
     }
+    public int getUserIdByUsername(String username) {
+        String query = "SELECT userID FROM users WHERE username = ?";
+        try (Connection connectDB = new DatabaseConnection().getConnection();
+             PreparedStatement preparedStatement = connectDB.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Return -1 if user ID is not found
+    }
 }

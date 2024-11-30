@@ -40,13 +40,13 @@ public class ArticleService {
 
             for (int i = 0; i < articlesArray.size(); i++) {
                 JsonObject articleJson = articlesArray.get(i).getAsJsonObject();
+                int id = articleJson.has("id") ? articleJson.get("id").getAsInt() : -1;
                 String title = articleJson.get("title").getAsString();
                 String source = articleJson.getAsJsonObject("source").get("name").getAsString();
                 String urlToArticle = articleJson.get("url").getAsString();
                 String content = articleJson.has("content") && !articleJson.get("content").isJsonNull() ? articleJson.get("content").getAsString() : "";
                 String publicationDate = articleJson.get("publishedAt").getAsString();
-                String urlToImage = articleJson.get("urlToImage").getAsString();
-                Article article = new Article(title, source, urlToArticle, content, "General", publicationDate);
+                Article article = new Article( id,title, source, urlToArticle, content, "General", publicationDate);
 
                 // Validate article and add to list if valid
                 if (article.isValid()) {

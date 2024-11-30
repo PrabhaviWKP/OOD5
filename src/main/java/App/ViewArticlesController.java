@@ -1,5 +1,6 @@
 package App;
 
+import Database.DatabaseHandler;
 import Model.Article;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,9 +22,13 @@ public class ViewArticlesController {
     private TextArea articleContent;
 
     private ArticleService articleService = new ArticleService();
+    private DatabaseHandler dbHandler = new DatabaseHandler();
+    private int userId;
+
 
     @FXML
-    public void initialize() {
+    public void initialize(int userId) {
+        this.userId = userId;
         // Fetch and display articles
         ObservableList<Article> articles = FXCollections.observableArrayList(articleService.getAllArticles());
         articlesList.setItems(articles);
@@ -45,6 +50,7 @@ public class ViewArticlesController {
         articlesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 showArticleContent(newValue);
+                saveViewedHistory(newValue.getId());
             }
         });
     }
@@ -63,5 +69,8 @@ public class ViewArticlesController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    private void saveViewedHistory(int articleId) {
+        dbHandler.saveViewedHistory(userId, articleId);
     }
 }

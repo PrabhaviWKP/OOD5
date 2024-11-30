@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Article {
+    private int id;
     private String title;
     private String source;
     private String url;
@@ -17,7 +18,8 @@ public class Article {
     }
 
     // Constructor
-    public Article(String title, String source, String url, String content, String category, String publicationDateStr) {
+    public Article(int id, String title, String source, String url, String content, String category, String publicationDateStr) {
+        this.id = id;
         this.title = title;
         this.source = source;
         this.url = url;
@@ -45,6 +47,7 @@ public class Article {
                 url != null && !url.isEmpty();
     }
     // Getters and other methods
+    public int getId() { return id; }
     public String getTitle() { return title; }
     public String getSource() { return source; }
     public String getUrl() { return url; }

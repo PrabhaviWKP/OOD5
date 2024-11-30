@@ -4,6 +4,7 @@ import Model.Article;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import Database.DatabaseHandler;
 
 public class ArticleContentController {
 

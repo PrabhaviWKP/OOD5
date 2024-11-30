@@ -36,7 +36,8 @@ public class LoginController {
                 Parent root = loader.load();
 
                 userDashboardController dashboardController = loader.getController();
-                dashboardController.initialize(userName); // Pass the username to the dashboard controller
+                int userId = userService.getUserIdByUsername(userName);
+                dashboardController.initialize(userName, userId); // Pass the username to the dashboard controller
 
                 Stage stage = (Stage) username.getScene().getWindow();
                 stage.setScene(new Scene(root));

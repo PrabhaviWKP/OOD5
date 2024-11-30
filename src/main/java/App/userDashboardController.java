@@ -13,10 +13,12 @@ public class userDashboardController {
     private Label lblWelcomeMessage;
 
     private String userName;
+    private int userId;
 
     // This method is called when the dashboard is initialized
-    public void initialize(String userName) {
+    public void initialize(String userName, int userId) {
         this.userName = userName;
+        this.userId = userId;
         lblWelcomeMessage.setText("Welcome, " + userName + "!");
     }
 
@@ -27,6 +29,8 @@ public class userDashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/ViewArticles.fxml"));
             Parent root = loader.load();
+            ViewArticlesController controller = loader.getController();
+            controller.initialize(userId); // Pass the user ID to the ViewArticlesController
             Stage stage = new Stage();
             stage.setTitle("View Articles");
             stage.setScene(new Scene(root));

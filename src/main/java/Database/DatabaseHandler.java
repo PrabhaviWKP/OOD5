@@ -16,8 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import static java.sql.DriverManager.getConnection;
-
 public class DatabaseHandler {
     private final DatabaseConnection databaseConnection;
 
@@ -105,7 +103,7 @@ public class DatabaseHandler {
         String responseBody = response.body();
         Gson gson = new Gson();
         Map<String, String> responseMap = gson.fromJson(responseBody, Map.class);
-        return responseMap.getOrDefault("category","Unknown"); // Return the category from the response
+        return responseMap.getOrDefault("category", "Unknown"); // Return the category from the response
     }
 
     // Store the last fetch time in the database
@@ -124,7 +122,6 @@ public class DatabaseHandler {
             e.printStackTrace();
         }
     }
-
 
     // Retrieve the last fetch time from the database
     public LocalDateTime getLastFetchTime() {
@@ -150,14 +147,14 @@ public class DatabaseHandler {
     // Retrieve all articles from the database
     public List<Article> getAllArticles() {
         List<Article> articles = new ArrayList<>();
-        String query = "SELECT title, source, url, content, category, publicationDate FROM articles";
+        String query = "SELECT id, title, source, url, content, category, publicationDate FROM articles";
         try (Connection connection = new DatabaseConnection().getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-
                 articles.add(new Article(
+                        resultSet.getInt("id"),
                         resultSet.getString("title"),
                         resultSet.getString("source"),
                         resultSet.getString("url"),
@@ -173,4 +170,20 @@ public class DatabaseHandler {
         return articles;
     }
 
+    // Method to save viewed article history
+    public void saveViewedHistory(int userId, int articleId) {
+        String sql = "INSERT INTO viewed_history (userID, articleID) VALUES (?, ?)";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            statement.setInt(2, articleId);
+
+            statement.executeUpdate();
+            System.out.println("Viewed history saved for user ID: " + userId + " and article ID: " + articleId);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
