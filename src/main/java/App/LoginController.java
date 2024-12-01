@@ -22,7 +22,6 @@ public class LoginController {
 
     private userService userService = new userService();
 
-
     // Handle login logic
     @FXML
     private void handleLogin() {
@@ -36,8 +35,9 @@ public class LoginController {
                 Parent root = loader.load();
 
                 userDashboardController dashboardController = loader.getController();
-                int userId = userService.getUserIdByUsername(userName);
-                dashboardController.initialize(userName, userId); // Pass the username to the dashboard controller
+                int userId = userService.getUserIdByUsername(userName); // Get the user ID
+                User user = new User(userId, userName, "", "", "", ""); // Create a User object
+                dashboardController.initialize(userName, user); // Pass the user name and user object to the dashboard controller
 
                 Stage stage = (Stage) username.getScene().getWindow();
                 stage.setScene(new Scene(root));

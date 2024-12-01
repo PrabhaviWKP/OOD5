@@ -55,4 +55,24 @@ public class User {
     public static boolean isValidPassword(String password) {
         return password.length() >= 6;
     }
+
+    // Method to record viewed article
+    public void recordViewedArticle(int articleId, DatabaseHandler dbHandler) {
+        dbHandler.saveViewedHistory(this.userID, articleId);
+    }
+
+    // Method to like an article
+    public void likeArticle(int articleId, DatabaseHandler dbHandler) {
+        dbHandler.saveLikedArticle(this.userID, articleId);
+    }
+
+    // Method to check if an article is liked
+    public boolean isArticleLiked(int articleId, DatabaseHandler dbHandler) {
+        return dbHandler.isArticleLiked(this.userID, articleId);
+    }
+
+    // Method to skip an article
+    public void skipArticle(int articleId, DatabaseHandler dbHandler) {
+        dbHandler.saveSkippedArticle(this.userID, articleId);
+    }
 }

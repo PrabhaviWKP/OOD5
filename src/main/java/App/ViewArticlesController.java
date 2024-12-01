@@ -1,7 +1,7 @@
 package App;
 
-import Database.DatabaseHandler;
 import Model.Article;
+import Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,26 +9,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import Service.ArticleService;
 import javafx.stage.Stage;
+import Service.ArticleService;
+import Service.userService;
+import Database.DatabaseHandler;
 
 public class ViewArticlesController {
 
     @FXML
     private ListView<Article> articlesList;
 
-    @FXML
-    private TextArea articleContent;
-
     private ArticleService articleService = new ArticleService();
     private DatabaseHandler dbHandler = new DatabaseHandler();
-    private int userId;
-
+    private User user; // Store the user object
 
     @FXML
-    public void initialize(int userId) {
-        this.userId = userId;
+    public void initialize(User user) {
+        this.user = user;
         // Fetch and display articles
         ObservableList<Article> articles = FXCollections.observableArrayList(articleService.getAllArticles());
         articlesList.setItems(articles);
@@ -50,7 +47,7 @@ public class ViewArticlesController {
         articlesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 showArticleContent(newValue);
-                saveViewedHistory(newValue.getId());
+                user.recordViewedArticle(newValue.getId(), dbHandler);
             }
         });
     }
@@ -60,7 +57,7 @@ public class ViewArticlesController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/ArticleContent.fxml"));
             Parent root = loader.load();
             ArticleContentController controller = loader.getController();
-            controller.initialize(article);
+            controller.initialize(article, user); // Pass the Article object to the ArticleContentController
 
             Stage stage = new Stage();
             stage.setTitle("Article Content");
@@ -69,8 +66,5 @@ public class ViewArticlesController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    private void saveViewedHistory(int articleId) {
-        dbHandler.saveViewedHistory(userId, articleId);
     }
 }

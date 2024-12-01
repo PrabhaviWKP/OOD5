@@ -1,5 +1,6 @@
 package Service;
 
+import Database.DatabaseHandler;
 import Model.User;
 import Database.DatabaseConnection;
 
@@ -92,5 +93,20 @@ public class userService {
             e.printStackTrace();
         }
         return -1; // Return -1 if user ID is not found
+    }
+
+    // Method to record viewed article
+    public void recordViewedArticle(int userId, int articleId, DatabaseHandler dbHandler) {
+        dbHandler.saveViewedHistory(userId, articleId);
+    }
+
+    // Method to like an article
+    public void likeArticle(int userId, int articleId, DatabaseHandler dbHandler) {
+        dbHandler.saveLikedArticle(userId, articleId);
+    }
+
+    // Method to check if an article is liked
+    public boolean isArticleLiked(int userId, int articleId, DatabaseHandler dbHandler) {
+        return dbHandler.isArticleLiked(userId, articleId);
     }
 }

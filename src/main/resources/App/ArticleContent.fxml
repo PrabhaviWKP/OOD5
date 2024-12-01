@@ -3,9 +3,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ArticleContentController">
     <Label fx:id="titleLabel" text="Title" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
     <Label fx:id="sourceLabel" text="Source" style="-fx-font-size: 14px;"/>
     <TextArea fx:id="contentTextArea" editable="false" wrapText="true" style="-fx-font-size: 14px;"/>
+    <Button fx:id="skipButton" text="Skip" onAction="#handleSkip"/>
+    <Button fx:id="likeButton" text="Like" onAction="#handleLike"/>
 </VBox>

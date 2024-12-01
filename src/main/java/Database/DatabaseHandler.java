@@ -172,18 +172,84 @@ public class DatabaseHandler {
 
     // Method to save viewed article history
     public void saveViewedHistory(int userId, int articleId) {
-        String sql = "INSERT INTO viewed_history (userID, articleID) VALUES (?, ?)";
+        if (!isEntryExists(userId, articleId, "viewed_history")) {
+            String sql = "INSERT INTO viewed_history (userID, articleID) VALUES (?, ?)";
+            try (Connection connection = databaseConnection.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                statement.setInt(1, userId);
+                statement.setInt(2, articleId);
+
+                statement.executeUpdate();
+                System.out.println("Viewed history saved for user ID: " + userId + " and article ID: " + articleId);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Method to save liked article
+    public void saveLikedArticle(int userId, int articleId) {
+        if (!isEntryExists(userId, articleId, "article_likes")) {
+            String sql = "INSERT INTO article_likes (userID, articleID) VALUES (?, ?)";
+            try (Connection connection = databaseConnection.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                statement.setInt(1, userId);
+                statement.setInt(2, articleId);
+
+                statement.executeUpdate();
+                System.out.println("Liked article saved for user ID: " + userId + " and article ID: " + articleId);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Method to check if an article is already liked by a user
+    public boolean isArticleLiked(int userId, int articleId) {
+        return isEntryExists(userId, articleId, "article_likes");
+    }
+
+    // Method to save skipped article
+    public void saveSkippedArticle(int userId, int articleId) {
+        if (!isEntryExists(userId, articleId, "article_skips")) {
+            String sql = "INSERT INTO article_skips (userID, articleID) VALUES (?, ?)";
+            try (Connection connection = databaseConnection.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                statement.setInt(1, userId);
+                statement.setInt(2, articleId);
+
+                statement.executeUpdate();
+                System.out.println("Skipped article saved for user ID: " + userId + " and article ID: " + articleId);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Method to check if an entry exists
+    private boolean isEntryExists(int userId, int articleId, String tableName) {
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE userID = ? AND articleID = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
             statement.setInt(2, articleId);
 
-            statement.executeUpdate();
-            System.out.println("Viewed history saved for user ID: " + userId + " and article ID: " + articleId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
+
 }

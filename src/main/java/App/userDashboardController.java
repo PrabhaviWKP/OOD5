@@ -1,5 +1,6 @@
 package App;
 
+import Model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -13,14 +14,15 @@ public class userDashboardController {
     private Label lblWelcomeMessage;
 
     private String userName;
-    private int userId;
+    private User user; // Store the user object
 
     // This method is called when the dashboard is initialized
-    public void initialize(String userName, int userId) {
+    public void initialize(String userName, User user) {
         this.userName = userName;
-        this.userId = userId;
+        this.user = user;
         lblWelcomeMessage.setText("Welcome, " + userName + "!");
     }
+
 
     // Handle the "View Articles" button
     @FXML
@@ -30,7 +32,8 @@ public class userDashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/ViewArticles.fxml"));
             Parent root = loader.load();
             ViewArticlesController controller = loader.getController();
-            controller.initialize(userId); // Pass the user ID to the ViewArticlesController
+            controller.initialize(user); // Pass the user object to the ViewArticlesController
+
             Stage stage = new Stage();
             stage.setTitle("View Articles");
             stage.setScene(new Scene(root));

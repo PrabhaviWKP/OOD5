@@ -1,10 +1,16 @@
 package App;
 
 import Model.Article;
+import Model.User;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import Database.DatabaseHandler;
+import javafx.stage.Stage;
 
 public class ArticleContentController {
 
@@ -17,12 +23,53 @@ public class ArticleContentController {
     @FXML
     private TextArea contentTextArea;
 
-    private Article article;
+    @FXML
+    private Button likeButton;
 
-    public void initialize(Article article) {
+    @FXML
+    private Button skipButton;
+
+    private Article article;
+    private User user; // Declare the user variable
+    private DatabaseHandler dbHandler = new DatabaseHandler();
+
+    public void initialize(Article article, User user) {
         this.article = article;
+        this.user = user; // Initialize the user variable
         titleLabel.setText(article.getTitle());
         sourceLabel.setText(article.getSource());
         contentTextArea.setText(article.getContent());
+
+        // Check if the article is already liked
+        if (user.isArticleLiked(article.getId(), dbHandler)) {
+            likeButton.setText("Liked");
+            likeButton.setDisable(true);
+            skipButton.setDisable(true); // Disable the skip button if the article is already liked
+        }
+    }
+
+    @FXML
+    private void handleLike() {
+        // Check if the article is already liked
+        if (!user.isArticleLiked(article.getId(), dbHandler)) {
+            user.likeArticle(article.getId(), dbHandler);
+            likeButton.setText("Liked");
+            likeButton.setDisable(true);
+            skipButton.setDisable(true); // Disable the skip button if the article is liked
+        }
+    }
+
+    @FXML
+    private void handleSkip() {
+        // Update the user's preferences to reflect that the article has been skipped
+        user.skipArticle(article.getId(), dbHandler);
+        // Navigate back to the article list without creating a new view article window
+        navigateToArticleList();
+    }
+
+    private void navigateToArticleList() {
+        // Close the current window to return to the previous window
+        Stage stage = (Stage) skipButton.getScene().getWindow();
+        stage.close();
     }
 }
