@@ -1,6 +1,8 @@
 package Model;
 
 import Database.DatabaseHandler;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -10,6 +12,9 @@ public class User {
     private String lastName;
     private String password;
     private String preferences;
+    private List<Integer> likedArticles;
+    private List<Integer> viewedArticles;
+    private List<Integer> skippedArticles;
 
     public User(int userID, String userName, String firstName, String lastName, String password, String preferences) {
         this.userID = userID;
@@ -18,6 +23,9 @@ public class User {
         this.lastName = lastName;
         this.password = password;
         this.preferences = preferences;
+        this.likedArticles = new ArrayList<>();
+        this.viewedArticles = new ArrayList<>();
+        this.skippedArticles = new ArrayList<>();
     }
 
     public int getUserID() {
@@ -56,23 +64,21 @@ public class User {
         return password.length() >= 6;
     }
 
-    // Method to record viewed article
-    public void recordViewedArticle(int articleId, DatabaseHandler dbHandler) {
-        dbHandler.saveViewedHistory(this.userID, articleId);
-    }
+
 
     // Method to like an article
     public void likeArticle(int articleId, DatabaseHandler dbHandler) {
-        dbHandler.saveLikedArticle(this.userID, articleId);
-    }
-
-    // Method to check if an article is liked
-    public boolean isArticleLiked(int articleId, DatabaseHandler dbHandler) {
-        return dbHandler.isArticleLiked(this.userID, articleId);
+        if (!likedArticles.contains(articleId)) {
+            likedArticles.add(articleId);
+            dbHandler.saveLikedArticle(this.userID, articleId);
+        }
     }
 
     // Method to skip an article
     public void skipArticle(int articleId, DatabaseHandler dbHandler) {
-        dbHandler.saveSkippedArticle(this.userID, articleId);
+        if (!skippedArticles.contains(articleId)) {
+            skippedArticles.add(articleId);
+            dbHandler.saveSkippedArticle(this.userID, articleId);
+        }
     }
 }

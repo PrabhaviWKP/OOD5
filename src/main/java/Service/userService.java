@@ -100,13 +100,9 @@ public class userService {
         dbHandler.saveViewedHistory(userId, articleId);
     }
 
-    // Method to like an article
-    public void likeArticle(int userId, int articleId, DatabaseHandler dbHandler) {
-        dbHandler.saveLikedArticle(userId, articleId);
-    }
-
     // Method to check if an article is liked
     public boolean isArticleLiked(int userId, int articleId, DatabaseHandler dbHandler) {
         return dbHandler.isArticleLiked(userId, articleId);
     }
+
 }

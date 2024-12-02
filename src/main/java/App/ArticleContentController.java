@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import Database.DatabaseHandler;
 import javafx.stage.Stage;
+import Service.userService;
 
 public class ArticleContentController {
 
@@ -32,6 +33,8 @@ public class ArticleContentController {
     private Article article;
     private User user; // Declare the user variable
     private DatabaseHandler dbHandler = new DatabaseHandler();
+    private userService userService = new userService();
+
 
     public void initialize(Article article, User user) {
         this.article = article;
@@ -41,7 +44,7 @@ public class ArticleContentController {
         contentTextArea.setText(article.getContent());
 
         // Check if the article is already liked
-        if (user.isArticleLiked(article.getId(), dbHandler)) {
+        if (userService.isArticleLiked(user.getUserID(), article.getId(), dbHandler)) {
             likeButton.setText("Liked");
             likeButton.setDisable(true);
             skipButton.setDisable(true); // Disable the skip button if the article is already liked
@@ -51,8 +54,9 @@ public class ArticleContentController {
     @FXML
     private void handleLike() {
         // Check if the article is already liked
-        if (!user.isArticleLiked(article.getId(), dbHandler)) {
+        if (!userService.isArticleLiked(user.getUserID(), article.getId(), dbHandler)) {
             user.likeArticle(article.getId(), dbHandler);
+            userService.recordViewedArticle(user.getUserID(), article.getId(), dbHandler);
             likeButton.setText("Liked");
             likeButton.setDisable(true);
             skipButton.setDisable(true); // Disable the skip button if the article is liked

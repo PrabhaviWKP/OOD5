@@ -72,4 +72,23 @@ public class userDashboardController {
             e.printStackTrace();
         }
     }
+
+    // Handle the "View Personalized Articles" button
+    @FXML
+    private void handleViewPersonalizedArticles() {
+        // Logic to go to the "View Personalized Articles" screen
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/PersonalizedArticles.fxml"));
+            Parent root = loader.load();
+            PersonalizedArticlesController controller = loader.getController();
+            controller.initialize(user);
+
+            Stage stage = new Stage();
+            stage.setTitle("Personalized Articles");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

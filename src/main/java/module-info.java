@@ -7,6 +7,8 @@ module org.example.ood5 {
     requires java.net.http;
     requires jdk.httpserver;
     requires mysql.connector.j;
+    requires deeplearning4j.nn;
+    requires nd4j.api;
 
 
     opens Main to javafx.graphics, javafx.fxml;

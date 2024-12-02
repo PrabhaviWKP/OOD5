@@ -14,6 +14,8 @@ import Service.ArticleService;
 import Service.userService;
 import Database.DatabaseHandler;
 
+import java.util.List;
+
 public class ViewArticlesController {
 
     @FXML
@@ -21,6 +23,7 @@ public class ViewArticlesController {
 
     private ArticleService articleService = new ArticleService();
     private DatabaseHandler dbHandler = new DatabaseHandler();
+    private userService userService = new userService();
     private User user; // Store the user object
 
     @FXML
@@ -47,7 +50,7 @@ public class ViewArticlesController {
         articlesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 showArticleContent(newValue);
-                user.recordViewedArticle(newValue.getId(), dbHandler);
+                userService.recordViewedArticle(user.getUserID(), newValue.getId(), dbHandler);
             }
         });
     }
@@ -67,4 +70,5 @@ public class ViewArticlesController {
             e.printStackTrace();
         }
     }
+
 }
