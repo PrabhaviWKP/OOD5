@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArticleService {
     private DatabaseHandler dbHandler = new DatabaseHandler();
@@ -64,5 +65,12 @@ public class ArticleService {
     // Fetch all articles from the database
     public List<Article> getAllArticles() {
         return dbHandler.getAllArticles();
+    }
+
+    // Fetch articles by their IDs
+    public List<Article> getArticlesByIds(List<String> articleIds) {
+        return dbHandler.getAllArticles().stream()
+                .filter(article -> articleIds.contains(article.getId()))
+                .collect(Collectors.toList());
     }
 }

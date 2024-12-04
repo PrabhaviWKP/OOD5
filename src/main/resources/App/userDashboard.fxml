@@ -15,7 +15,7 @@
     <Button text="View Articles" onAction="#handleViewArticles" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
     <!-- View Personalized Articles Button -->
-    <Button text="View Personalized Articles" onAction="#handleViewPersonalizedArticles" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <Button text="View Personalized Articles" onAction="#handlePersonalizedArticles" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
     <!-- Edit Preferences Button -->
     <Button text="Edit Preferences" onAction="#handleEditPreferences" GridPane.rowIndex="3" GridPane.columnIndex="0"/>

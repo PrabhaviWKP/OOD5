@@ -29,9 +29,8 @@ public class Article {
 
     }
 
-    // Utility to parse date
     private Date parseDate(String dateString) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             return formatter.parse(dateString);
         } catch (ParseException e) {
@@ -39,6 +38,7 @@ public class Article {
             return null;
         }
     }
+
 
     // Validate essential fields
     public boolean isValid() {
