@@ -2,16 +2,18 @@ package App;
 
 import Model.Article;
 import Model.User;
+import Service.userService;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import Database.DatabaseHandler;
 import javafx.stage.Stage;
-import Service.userService;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 public class ArticleContentController {
 
@@ -34,7 +36,6 @@ public class ArticleContentController {
     private User user; // Declare the user variable
     private DatabaseHandler dbHandler = new DatabaseHandler();
     private userService userService = new userService();
-
 
     public void initialize(Article article, User user) {
         this.article = article;

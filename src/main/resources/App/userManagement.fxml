@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="App.userManagementController" spacing="10" alignment="CENTER" prefWidth="800" prefHeight="600" stylesheets="@styles.css">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    <Button text="Edit Preferences" onAction="#handleEditPreferences" styleClass="button" />
+    <Button text="Edit Password" onAction="#handleEditPassword" styleClass="button" />
+</VBox>

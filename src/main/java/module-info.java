@@ -8,6 +8,7 @@ module org.example.ood5 {
     requires jdk.httpserver;
     requires mysql.connector.j;
     requires librec.core;
+    requires commons.math3;
 
 
     opens Main to javafx.graphics, javafx.fxml;

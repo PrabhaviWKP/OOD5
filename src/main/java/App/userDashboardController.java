@@ -61,20 +61,18 @@ public class userDashboardController {
         }
     }
 
-    // Handle the "Edit Preferences" button
+    // Handle the "User Management" button
     @FXML
-    private void handleEditPreferences() {
-        // Logic to go to the "Edit Preferences" screen
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/your/EditPreferences.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Edit Preferences");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void handleUserManagement() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/userManagement.fxml"));
+        Parent root = loader.load();
+        userManagementController controller = loader.getController();
+        controller.initialize(user); // Pass the user object to the userManagementController
+
+        Stage stage = new Stage();
+        stage.setTitle("User Management");
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     // Handle the "Log Out" button
@@ -82,7 +80,7 @@ public class userDashboardController {
     private void handleLogOut() {
         // Logic to log out the user and return to the login screen
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/your/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/Login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) lblWelcomeMessage.getScene().getWindow();
             stage.setScene(new Scene(root));

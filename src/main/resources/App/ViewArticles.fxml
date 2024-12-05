@@ -4,7 +4,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ViewArticlesController">
-    <ListView fx:id="articlesList" />
-    <TextArea fx:id="articleContent" editable="false" wrapText="true" />
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ViewArticlesController" spacing="10" alignment="CENTER" prefWidth="800" prefHeight="600" stylesheets="@styles.css">
+    <ListView fx:id="articlesList" styleClass="list-view" />
+    <TextArea fx:id="articleContent" editable="false" wrapText="true" styleClass="text-area" />
 </VBox>

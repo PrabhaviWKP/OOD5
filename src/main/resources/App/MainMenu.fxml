@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<GridPane fx:controller="App.MainMenuController" xmlns:fx="http://javafx.com/fxml/1" alignment="center" hgap="10" vgap="10">
-    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+<GridPane alignment="center" hgap="10" prefHeight="600" prefWidth="800" stylesheets="@styles.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="App.MainMenuController">
+    <padding><Insets bottom="40" left="40" right="40" top="40" /></padding>
 
     <!-- Register Button -->
-    <Button text="Login" onAction="#handleGoToLogin" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-    <Button text="Register" onAction="#handleGoToRegister" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-
+    <Button onAction="#handleGoToLogin" prefHeight="77.0" prefWidth="363.0" styleClass="button" text="Login" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <font>
+         <Font size="54.0" />
+      </font></Button>
+    <Button onAction="#handleGoToRegister" prefHeight="74.0" prefWidth="362.0" styleClass="button" text="Register" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
 </GridPane>

@@ -1,7 +1,9 @@
 package Service;
 
 import Database.DatabaseHandler;
+import Model.SystemUser;
 import Model.User;
+import Model.Admin;
 import Database.DatabaseConnection;
 
 import java.sql.*;
@@ -10,7 +12,6 @@ public class userService {
     private static final String url = "jdbc:mysql://localhost:3306/sample1"; // replace with your database URL
     private static final String dbusername = "root"; // replace with your DB username
     private static final String dbpassword = "Prabs1412"; // replace with your DB password
-
 
     public int getNextUserId() {
         int nextUserId = 1;
@@ -43,7 +44,7 @@ public class userService {
         return false;
     }
 
-    public boolean registerUser(User user) {
+    public boolean registerUser(SystemUser user) {
         String insertQuery = "INSERT INTO users (userID, userName, firstName, lastName, password, preferences) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connectDB = new DatabaseConnection().getConnection();
              PreparedStatement preparedStatement = connectDB.prepareStatement(insertQuery)) {
@@ -53,7 +54,12 @@ public class userService {
             preparedStatement.setString(3, user.getFirstName());
             preparedStatement.setString(4, user.getLastName());
             preparedStatement.setString(5, user.getPassword());
-            preparedStatement.setString(6, user.getPreferences());
+
+            if (user instanceof User) {
+                preparedStatement.setString(6, ((User) user).getPreferences());
+            } else {
+                preparedStatement.setString(6, null); // Admin does not have preferences
+            }
 
             return preparedStatement.executeUpdate() > 0;
 
@@ -95,6 +101,21 @@ public class userService {
         return -1; // Return -1 if user ID is not found
     }
 
+    public String getUserTypeByUsername(String username) {
+        String query = "SELECT userType FROM users WHERE username = ?";
+        try (Connection connectDB = new DatabaseConnection().getConnection();
+             PreparedStatement preparedStatement = connectDB.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if user type is not found
+    }
+
     // Method to record viewed article
     public void recordViewedArticle(int userId, int articleId, DatabaseHandler dbHandler) {
         dbHandler.saveViewedHistory(userId, articleId);
@@ -104,5 +125,4 @@ public class userService {
     public boolean isArticleLiked(int userId, int articleId, DatabaseHandler dbHandler) {
         return dbHandler.isArticleLiked(userId, articleId);
     }
-
 }

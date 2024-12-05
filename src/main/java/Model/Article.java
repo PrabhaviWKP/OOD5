@@ -30,7 +30,7 @@ public class Article {
     }
 
     private Date parseDate(String dateString) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             return formatter.parse(dateString);
         } catch (ParseException e) {
@@ -38,7 +38,6 @@ public class Article {
             return null;
         }
     }
-
 
     // Validate essential fields
     public boolean isValid() {

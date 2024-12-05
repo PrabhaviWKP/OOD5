@@ -1,6 +1,8 @@
 package App;
 
+import Model.SystemUser;
 import Model.User;
+import Model.Admin;
 import Service.userService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,6 +32,8 @@ public class RegisterController extends BaseController {
     private PasswordField txtConfirmPassword;
     @FXML
     private VBox preferencesBox;
+    @FXML
+    private CheckBox isAdminCheckBox;
 
     private userService userService = new userService();
 
@@ -46,6 +50,7 @@ public class RegisterController extends BaseController {
         String lastName = txtLastName.getText();
         String password = txtPassword.getText();
         String confirmPassword = txtConfirmPassword.getText();
+        boolean isAdmin = isAdminCheckBox.isSelected();
 
         if (userName.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill all the fields.");
@@ -73,20 +78,26 @@ public class RegisterController extends BaseController {
 
         // Collect selected preferences
         StringBuilder preferences = new StringBuilder();
-        for (Node node : preferencesBox.getChildren()) {
-            if (node instanceof CheckBox) {
-                CheckBox checkBox = (CheckBox) node;
-                if (checkBox.isSelected()) {
-                    if (preferences.length() > 0) {
-                        preferences.append(",");
+        if (!isAdmin) {
+            for (Node node : preferencesBox.getChildren()) {
+                if (node instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) node;
+                    if (checkBox.isSelected()) {
+                        if (preferences.length() > 0) {
+                            preferences.append(",");
+                        }
+                        preferences.append(checkBox.getText());
                     }
-                    preferences.append(checkBox.getText());
                 }
             }
         }
 
-        User newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password, preferences.toString());
-        newUser.setPreferences(preferences.toString()); // Add preferences to the User object
+        SystemUser newUser;
+        if (isAdmin) {
+            newUser = new Admin(userService.getNextUserId(), userName, firstName, lastName, password);
+        } else {
+            newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password, preferences.toString());
+        }
 
         if (userService.registerUser(newUser)) {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Welcome " + userName + "!");

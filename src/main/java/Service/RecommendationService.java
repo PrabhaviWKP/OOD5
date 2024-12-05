@@ -2,114 +2,101 @@ package Service;
 
 import Database.DatabaseHandler;
 import Model.Article;
-import net.librec.common.LibrecException;
-import net.librec.conf.Configuration;
-import net.librec.data.DataModel;
-import net.librec.data.model.TextDataModel;
-import net.librec.recommender.RecommenderContext;
-import net.librec.recommender.cf.UserKNNRecommender;
-import net.librec.recommender.item.RecommendedItem;
-import net.librec.similarity.PCCSimilarity;
+import Model.SystemUser;
+import Model.User;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RecommendationService {
-    private final DatabaseHandler dbHandler = new DatabaseHandler();
 
-    // Method to get recommendations for a user
-    public List<RecommendedItem> getRecommendations(int userId) throws LibrecException, IOException {
-        // Fetch viewed and liked articles for the user
-        List<Article> viewedArticles = dbHandler.getViewedArticles(userId);
-        List<Article> likedArticles = dbHandler.getLikedArticles(userId);
+    private DatabaseHandler dbHandler = new DatabaseHandler();
 
-        // Create LibRec-compatible data format (UIR: UserId, ItemId, Rating)
-        File tempFile = createInteractionFile(userId, viewedArticles, likedArticles);
+    public MatrixFactorizationModel trainModel(SystemUser user) {
+        if (user instanceof User) {
+            List<Article> likedArticles = dbHandler.getLikedArticles(user.getUserID());
+            List<Article> viewedArticles = dbHandler.getViewedArticles(user.getUserID());
+            List<Article> allArticles = dbHandler.getAllArticles();
 
-        // Load the data into LibRec's DataModel
-        DataModel dataModel = buildDataModel(tempFile);
+            int numUsers = 1; // Since we are training for a single user
+            int numItems = allArticles.size();
+            int numFactors = 10; // Number of latent factors
+            double learningRate = 0.01;
+            double regularization = 0.01;
+            int numIterations = 50;
 
-        // Configure and train the recommender
-        Configuration config = new Configuration();
-        config.set("data.model.splitter", "ratio");
-        config.set("data.model.splitter.ratio", "0.8"); // 80-20 train-test split
-        config.set("data.input.path", tempFile.getAbsolutePath());
-        config.set("data.column.format", "UIR");
-        config.set("rec.recommender.class", UserKNNRecommender.class.getName());
-        config.set("rec.similarity.class", PCCSimilarity.class.getName());
-        config.set("rec.neighbors.knn.number", "10");
+            int[][] ratings = new int[numUsers][numItems];
 
-        RecommenderContext context = new RecommenderContext(config, dataModel);
-        UserKNNRecommender recommender = new UserKNNRecommender();
-        recommender.setContext(context);
+            // Create a map from article ID to index
+            Map<Integer, Integer> articleIdToIndex = new HashMap<>();
+            for (int i = 0; i < allArticles.size(); i++) {
+                articleIdToIndex.put(allArticles.get(i).getId(), i);
+            }
 
-        // Debug statement to check similarity matrix
-        if (context.getSimilarity() == null) {
-            System.out.println("Similarity matrix is null");
-        } else {
-            System.out.println("Similarity matrix is initialized");
-        }
-
-        recommender.train(context);
-
-        // Get recommendations
-        List<RecommendedItem> recommendedItems = (List<RecommendedItem>) recommender.recommendRank();
-        // Debug statement to check recommendations
-        System.out.println("Recommendations fetched: " + recommendedItems.size());
-
-        return recommendedItems;
-    }
-
-    private File createInteractionFile(int userId, List<Article> viewedArticles, List<Article> likedArticles) throws IOException {
-        File dataDir = new File("data");
-        if (!dataDir.exists()) {
-            dataDir.mkdirs();
-        }
-        File tempFile = new File(dataDir, "user_interactions.csv");
-        System.out.println("Temporary file created: " + tempFile.getAbsolutePath()); // Debug statement
-        try (FileWriter writer = new FileWriter(tempFile)) {
+            // Populate the rating matrix
             for (Article article : likedArticles) {
-                writer.write(userId + "," + article.getId() + ",1\n");
+                int index = articleIdToIndex.get(article.getId());
+                ratings[0][index] = 5; // Liked articles get a high rating
             }
             for (Article article : viewedArticles) {
-                writer.write(userId + "," + article.getId() + ",0\n");
+                int index = articleIdToIndex.get(article.getId());
+                ratings[0][index] = 3; // Viewed articles get a lower rating
             }
-        }
-        // Verify that the file exists
-        if (tempFile.exists()) {
-            System.out.println("File exists: " + tempFile.getAbsolutePath());
+
+            // Train the ALS model
+            ALS als = new ALS(numUsers, numItems, numFactors, learningRate, regularization, numIterations);
+            als.train(ratings);
+
+            return als.getModel();
         } else {
-            System.out.println("File does not exist: " + tempFile.getAbsolutePath());
+            // Admin does not need recommendations
+            return null;
         }
-        return tempFile;
     }
 
-    private DataModel buildDataModel(File interactionFile) throws LibrecException, IOException {
-        Configuration conf = new Configuration();
+    public List<Article> getRecommendations(SystemUser user, MatrixFactorizationModel model) {
+        if (user instanceof User) {
+            List<Article> allArticles = dbHandler.getAllArticles();
+            List<Article> recommendations = new ArrayList<>();
 
-        // Use absolute path and replace backslashes with forward slashes
-        String filePath = interactionFile.getAbsolutePath().replace("\\", "/");
-        System.out.println("File path to be set: " + filePath); // Debugging
+            // Create a map from article ID to index
+            Map<Integer, Integer> articleIdToIndex = new HashMap<>();
+            for (int i = 0; i < allArticles.size(); i++) {
+                articleIdToIndex.put(allArticles.get(i).getId(), i);
+            }
 
-        // File existence check
-        File tempFile = new File(filePath);
-        if (!tempFile.exists()) {
-            throw new IOException("File does not exist: " + tempFile.getAbsolutePath());
+            // Predict ratings for all articles
+            Map<Article, Double> predictedRatings = new HashMap<>();
+            for (Article article : allArticles) {
+                int index = articleIdToIndex.get(article.getId());
+                double predictedRating = model.predict(0, index);
+                predictedRatings.put(article, predictedRating);
+            }
+
+            // Sort articles by predicted rating and get the top 10
+            recommendations = predictedRatings.entrySet().stream()
+                    .sorted(Map.Entry.<Article, Double>comparingByValue().reversed())
+                    .limit(10) // Limit to top 10 recommendations
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            // Fallback: If no recommendations, get popular articles
+            if (recommendations.isEmpty()) {
+                recommendations = getPopularArticles();
+            }
+
+            return recommendations;
+        } else {
+            // Admin does not need recommendations
+            return new ArrayList<>();
         }
-        System.out.println("File confirmed: " + tempFile.getAbsolutePath()); // Debugging
+    }
 
-        // Configure LibRec settings
-        conf.set("dfs.data.dir", interactionFile.getParentFile().getAbsolutePath().replace("\\", "/"));
-        conf.set("data.input.path", interactionFile.getName());
-        conf.set("data.column.format", "UIR");
-        conf.set("data.model.splitter", "ratio");
-        conf.set("data.model.splitter.ratio", "0.8"); // 80-20 train-test split
-
-        DataModel dataModel = new TextDataModel(conf);
-        dataModel.buildDataModel(); // Build the model
-        return dataModel;
+    private List<Article> getPopularArticles() {
+        // Fetch the most popular articles (e.g., based on the number of views or likes)
+        return dbHandler.getPopularArticles();
     }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="App.adminDashboardController" spacing="10" alignment="CENTER" prefWidth="800" prefHeight="600" stylesheets="@styles.css">
+    <padding>
+        <Insets top="60" right="60" bottom="60" left="60"/>
+    </padding>
+    <Label fx:id="lblWelcomeMessage" text="Welcome, Admin!" styleClass="label" />
+    <Button text="Delete Article" onAction="#handleShowDeleteArticle" styleClass="button" />
+    <Button text="Delete User" onAction="#handleShowDeleteUser" styleClass="button" />
+</VBox>
