@@ -12,4 +12,5 @@
     <Label fx:id="lblWelcomeMessage" text="Welcome, Admin!" styleClass="label" />
     <Button text="Delete Article" onAction="#handleShowDeleteArticle" styleClass="button" />
     <Button text="Delete User" onAction="#handleShowDeleteUser" styleClass="button" />
+    <Button text="Log out" onAction="#handleLogOut" styleClass="button" />
 </VBox>

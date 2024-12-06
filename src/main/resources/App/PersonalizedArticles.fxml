@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
 
+
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.PersonalizedArticlesController" spacing="10" alignment="CENTER" prefWidth="800" prefHeight="600" stylesheets="@styles.css">
     <Label text="Personalized Articles for You:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
     <ListView fx:id="articlesListView" styleClass="list-view"/>

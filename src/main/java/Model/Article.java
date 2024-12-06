@@ -34,7 +34,6 @@ public class Article {
         try {
             return formatter.parse(dateString);
         } catch (ParseException e) {
-            System.out.println("Date parsing failed for: " + dateString);
             return null;
         }
     }
@@ -63,7 +62,4 @@ public class Article {
         this.title = title;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
 }

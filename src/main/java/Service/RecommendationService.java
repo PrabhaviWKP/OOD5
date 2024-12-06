@@ -19,7 +19,7 @@ public class RecommendationService {
         if (user instanceof User) {
             List<Article> likedArticles = dbHandler.getLikedArticles(user.getUserID());
             List<Article> viewedArticles = dbHandler.getViewedArticles(user.getUserID());
-            List<Article> allArticles = dbHandler.getAllArticles();
+            List<Article> allArticles = getNonSkippedArticles(user.getUserID());
 
             int numUsers = 1; // Since we are training for a single user
             int numItems = allArticles.size();
@@ -38,12 +38,16 @@ public class RecommendationService {
 
             // Populate the rating matrix
             for (Article article : likedArticles) {
-                int index = articleIdToIndex.get(article.getId());
-                ratings[0][index] = 5; // Liked articles get a high rating
+                Integer index = articleIdToIndex.get(article.getId());
+                if (index != null) {
+                    ratings[0][index] = 5; // Liked articles get a high rating
+                }
             }
             for (Article article : viewedArticles) {
-                int index = articleIdToIndex.get(article.getId());
-                ratings[0][index] = 3; // Viewed articles get a lower rating
+                Integer index = articleIdToIndex.get(article.getId());
+                if (index != null) {
+                    ratings[0][index] = 3; // Viewed articles get a lower rating
+                }
             }
 
             // Train the ALS model
@@ -59,7 +63,7 @@ public class RecommendationService {
 
     public List<Article> getRecommendations(SystemUser user, MatrixFactorizationModel model) {
         if (user instanceof User) {
-            List<Article> allArticles = dbHandler.getAllArticles();
+            List<Article> allArticles = getNonSkippedArticles(user.getUserID());
             List<Article> recommendations = new ArrayList<>();
 
             // Create a map from article ID to index
@@ -71,9 +75,11 @@ public class RecommendationService {
             // Predict ratings for all articles
             Map<Article, Double> predictedRatings = new HashMap<>();
             for (Article article : allArticles) {
-                int index = articleIdToIndex.get(article.getId());
-                double predictedRating = model.predict(0, index);
-                predictedRatings.put(article, predictedRating);
+                Integer index = articleIdToIndex.get(article.getId());
+                if (index != null) {
+                    double predictedRating = model.predict(0, index);
+                    predictedRatings.put(article, predictedRating);
+                }
             }
 
             // Sort articles by predicted rating and get the top 10
@@ -93,6 +99,17 @@ public class RecommendationService {
             // Admin does not need recommendations
             return new ArrayList<>();
         }
+    }
+
+    private List<Article> getNonSkippedArticles(int userId) {
+        List<Article> allArticles = dbHandler.getAllArticles();
+        List<Integer> skippedArticleIds = dbHandler.getSkippedArticles(userId).stream()
+                .map(Article::getId)
+                .collect(Collectors.toList());
+
+        return allArticles.stream()
+                .filter(article -> !skippedArticleIds.contains(article.getId()))
+                .collect(Collectors.toList());
     }
 
     private List<Article> getPopularArticles() {

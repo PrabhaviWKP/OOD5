@@ -112,7 +112,7 @@ public class DatabaseHandler {
         String responseBody = response.body();
         Gson gson = new Gson();
         Map<String, String> responseMap = gson.fromJson(responseBody, Map.class);
-        return responseMap.getOrDefault("category", "Unknown"); // Return the category from the response
+        return responseMap.getOrDefault("category", "General"); // Return the category from the response
     }
 
     // Store the last fetch time in the database
@@ -452,8 +452,34 @@ public class DatabaseHandler {
         });
     }
 
-    // Shutdown the ExecutorService when it is no longer needed
-    public void shutdown() {
-        executorService.shutdown();
+    // Method to get skipped articles for a user
+    public List<Article> getSkippedArticles(int userId) {
+        System.out.println("Fetching skipped articles for user ID: " + userId); // Debug statement
+        List<Article> skippedArticles = new ArrayList<>();
+        String sql = "SELECT a.id, a.title, a.source, a.url, a.content, a.category, a.publicationDate FROM articles a " +
+                "JOIN article_skips s ON a.id = s.articleID WHERE s.userID = ?";
+        System.out.println("SQL Query: " + sql); // Debug statement
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                skippedArticles.add(new Article(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("source"),
+                        resultSet.getString("url"),
+                        resultSet.getString("content"),
+                        resultSet.getString("category"),
+                        resultSet.getString("publicationDate")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Skipped Articles Fetched: " + skippedArticles.size()); // Debug statement
+        return skippedArticles;
     }
+
 }

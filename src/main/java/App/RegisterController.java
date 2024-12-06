@@ -1,8 +1,6 @@
 package App;
 
-import Model.SystemUser;
 import Model.User;
-import Model.Admin;
 import Service.userService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,9 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import Main.Main;
 
-import static Model.User.isValidName;
 
-public class RegisterController extends BaseController {
+public class RegisterController  {
 
     @FXML
     private TextField txtUserID;
@@ -32,13 +29,11 @@ public class RegisterController extends BaseController {
     private PasswordField txtConfirmPassword;
     @FXML
     private VBox preferencesBox;
-    @FXML
-    private CheckBox isAdminCheckBox;
 
     private userService userService = new userService();
 
     @FXML
-    public void initialize() {
+    public void initialize() { //method to get the next user ID
         int nextUserId = userService.getNextUserId();
         txtUserID.setText(String.valueOf(nextUserId));
     }
@@ -50,7 +45,6 @@ public class RegisterController extends BaseController {
         String lastName = txtLastName.getText();
         String password = txtPassword.getText();
         String confirmPassword = txtConfirmPassword.getText();
-        boolean isAdmin = isAdminCheckBox.isSelected();
 
         if (userName.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill all the fields.");
@@ -61,7 +55,7 @@ public class RegisterController extends BaseController {
             return;
         }
 
-        if (!User.isValidPassword(password)) {
+        if (!isValidPassword(password)) {
             showAlert(Alert.AlertType.ERROR, "Password Error", "Password must be at least 6 characters long.");
             return;
         }
@@ -78,26 +72,19 @@ public class RegisterController extends BaseController {
 
         // Collect selected preferences
         StringBuilder preferences = new StringBuilder();
-        if (!isAdmin) {
-            for (Node node : preferencesBox.getChildren()) {
-                if (node instanceof CheckBox) {
-                    CheckBox checkBox = (CheckBox) node;
-                    if (checkBox.isSelected()) {
-                        if (preferences.length() > 0) {
-                            preferences.append(",");
-                        }
-                        preferences.append(checkBox.getText());
+        for (Node node : preferencesBox.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                if (checkBox.isSelected()) {
+                    if (preferences.length() > 0) {
+                        preferences.append(",");
                     }
+                    preferences.append(checkBox.getText());
                 }
             }
         }
 
-        SystemUser newUser;
-        if (isAdmin) {
-            newUser = new Admin(userService.getNextUserId(), userName, firstName, lastName, password);
-        } else {
-            newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password, preferences.toString());
-        }
+        User newUser = new User(userService.getNextUserId(), userName, firstName, lastName, password, preferences.toString());
 
         if (userService.registerUser(newUser)) {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Welcome " + userName + "!");
@@ -123,5 +110,20 @@ public class RegisterController extends BaseController {
         txtLastName.clear();
         txtPassword.clear();
         txtConfirmPassword.clear();
+    }
+
+    protected void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    public static boolean isValidName(String name) {
+        return name.matches("[a-zA-Z]+");
+    }
+
+    public static boolean isValidPassword(String password) {
+        return password.length() >= 6;
     }
 }

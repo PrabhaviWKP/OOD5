@@ -2,6 +2,7 @@ package App;
 
 import Model.User;
 import Model.Admin;
+import Model.SystemUser;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -35,12 +36,19 @@ public class LoginController {
                 int userId = userService.getUserIdByUsername(userName); // Get the user ID
                 String userType = userService.getUserTypeByUsername(userName); // Get the user type
 
+                SystemUser systemUser;
                 if ("admin".equals(userType)) {
-                    Admin admin = new Admin(userId, userName, "", "", userPassword); // Create an Admin object
-                    loadAdminDashboard(admin);
+                    systemUser = new Admin(userId, userName, "", "", userPassword); // Create an Admin object
                 } else {
-                    User user = new User(userId, userName, "", "", userPassword, ""); // Create a User object
-                    loadUserDashboard(user);
+                    systemUser = new User(userId, userName, "", "", userPassword, ""); // Create a User object
+                }
+
+                if (systemUser.login(userName, userPassword, userService)) {
+                    if (systemUser instanceof Admin) {
+                        loadAdminDashboard((Admin) systemUser);
+                    } else {
+                        loadUserDashboard((User) systemUser);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

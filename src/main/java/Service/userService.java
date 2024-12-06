@@ -3,15 +3,11 @@ package Service;
 import Database.DatabaseHandler;
 import Model.SystemUser;
 import Model.User;
-import Model.Admin;
 import Database.DatabaseConnection;
 
 import java.sql.*;
 
 public class userService {
-    private static final String url = "jdbc:mysql://localhost:3306/sample1"; // replace with your database URL
-    private static final String dbusername = "root"; // replace with your DB username
-    private static final String dbpassword = "Prabs1412"; // replace with your DB password
 
     public int getNextUserId() {
         int nextUserId = 1;
@@ -71,12 +67,11 @@ public class userService {
 
     public boolean validateCredentials(String username, String password) {
         String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try(Connection connection = DriverManager.getConnection(url, dbusername, dbpassword);
-            PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, username);
-            statement.setString(2, password);
-            ResultSet resultSet = statement.executeQuery();
+        try (Connection connectDB = new DatabaseConnection().getConnection();
+             PreparedStatement preparedStatement = connectDB.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             // Check if any result is returned
             return resultSet.next();

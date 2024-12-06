@@ -56,7 +56,7 @@ public class adminDashboardController {
         // Logic to log out the user and return to the login screen
         admin.logOut(); // Call the logOut method from the User class
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/MainMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) lblWelcomeMessage.getScene().getWindow();
             stage.setScene(new Scene(root));

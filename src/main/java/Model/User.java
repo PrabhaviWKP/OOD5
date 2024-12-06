@@ -8,7 +8,6 @@ import java.util.List;
 public class User extends SystemUser {
     private String preferences;
     private List<Integer> likedArticles;
-    private List<Integer> viewedArticles;
     private List<Integer> skippedArticles;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
 
@@ -16,16 +15,11 @@ public class User extends SystemUser {
         super(userID, userName, firstName, lastName, password);
         this.preferences = preferences;
         this.likedArticles = new ArrayList<>();
-        this.viewedArticles = new ArrayList<>();
         this.skippedArticles = new ArrayList<>();
     }
 
     public String getPreferences() {
         return preferences;
-    }
-
-    public void setPreferences(String preferences) {
-        this.preferences = preferences;
     }
 
     // Method to like an article
@@ -57,5 +51,9 @@ public class User extends SystemUser {
         } else {
             throw new IllegalArgumentException("Password must be at least 6 characters long.");
         }
+    }
+
+    public static boolean isValidPassword(String password) {
+        return password.length() >= 6;
     }
 }

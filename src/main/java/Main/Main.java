@@ -91,13 +91,21 @@ public class Main extends Application {
             System.out.println("Fetching articles from API...");
             List<Article> articles = articleService.fetchArticlesFromAPI(); // Fetch articles from API
 
+            // Log articles
+            articles.forEach(article -> {
+                if (!dbHandler.articleExists(article.getUrl())) {
+                    Platform.runLater(() -> {
+                        System.out.println("Article inserted: " + article.getTitle());
+                        dbHandler.insertArticle(article);
+                    });
+                } else {
+                    System.out.println("Duplicate article found, skipping: " + article.getUrl());
+                }
+            });
+
+            // Update last fetch time after all articles have been processed
             Platform.runLater(() -> {
-                System.out.println("Articles fetched: " + articles.size());
-
-                // Store articles in the database
-                articles.forEach(article -> dbHandler.insertArticle(article));
-
-                // Update last fetch time
+                System.out.println("Updated last fetch time to: " + LocalDateTime.now());
                 dbHandler.storeLastFetchTime(LocalDateTime.now());
             });
         }).start();

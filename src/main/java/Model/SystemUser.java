@@ -1,5 +1,7 @@
 package Model;
 
+import Service.userService;
+
 public abstract class SystemUser {
     private int userID;
     private String userName;
@@ -35,11 +37,13 @@ public abstract class SystemUser {
         return password;
     }
 
-    public static boolean isValidName(String name) {
-        return name.matches("[a-zA-Z]+");
+    // Method to handle login logic
+    public boolean login(String userName, String password, userService userService) {
+        return userService.validateCredentials(userName, password);
     }
 
-    public static boolean isValidPassword(String password) {
-        return password.length() >= 6;
+    // Method to handle log out logic
+    public void logOut() {
+        System.out.println("User logged out successfully.");
     }
 }

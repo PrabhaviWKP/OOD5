@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ArticleService {
     private DatabaseHandler dbHandler = new DatabaseHandler();
@@ -24,10 +23,12 @@ public class ArticleService {
         List<Article> articles = new ArrayList<>();
 
         try {
+            // Open a connection to the API
             URL url = new URL(API_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            // Read the response from the API
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;
@@ -36,9 +37,11 @@ public class ArticleService {
             }
             reader.close();
 
+            // Parse the JSON response
             JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
             JsonArray articlesArray = jsonResponse.getAsJsonArray("articles");
 
+            // Iterate through the articles and create Article objects
             for (int i = 0; i < articlesArray.size(); i++) {
                 JsonObject articleJson = articlesArray.get(i).getAsJsonObject();
                 int id = articleJson.has("id") ? articleJson.get("id").getAsInt() : -1;
@@ -57,6 +60,7 @@ public class ArticleService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            // Handle exceptions appropriately
         }
 
         return articles;
@@ -65,12 +69,5 @@ public class ArticleService {
     // Fetch all articles from the database
     public List<Article> getAllArticles() {
         return dbHandler.getAllArticles();
-    }
-
-    // Fetch articles by their IDs
-    public List<Article> getArticlesByIds(List<String> articleIds) {
-        return dbHandler.getAllArticles().stream()
-                .filter(article -> articleIds.contains(article.getId()))
-                .collect(Collectors.toList());
     }
 }
