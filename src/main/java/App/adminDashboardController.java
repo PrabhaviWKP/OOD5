@@ -50,4 +50,18 @@ public class adminDashboardController {
         stage.setScene(new Scene(root));
         stage.show();
     }
+
+    @FXML
+    private void handleLogOut() {
+        // Logic to log out the user and return to the login screen
+        admin.logOut(); // Call the logOut method from the User class
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/App/Login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) lblWelcomeMessage.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
