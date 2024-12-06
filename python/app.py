@@ -26,7 +26,7 @@ def classify_text():
 
     # If confidence is below the threshold, return "Unknown"
     if confidence < CONFIDENCE_THRESHOLD:
-        top_category = "Unknown"
+        top_category = "General"
 
     return jsonify({"category": top_category})
 
